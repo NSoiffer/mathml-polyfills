@@ -57,12 +57,12 @@ mtd.curved-line {
 }
 
 mtd.precedes-separator {
-    padding-right: 0 !important;    // override an inline style
+    padding-right: 0 !important;    /* override an inline style */
 }
 
 mtd.separator {
-    padding-left: 0  !important;    
-    padding-right: 0 !important;    // override an inline style
+    padding-left: 0  !important;    /* override an inline style */
+    padding-right: 0 !important;    /* override an inline style */
 }
 
 .carry {
@@ -218,7 +218,7 @@ class TableCell {
             if (typeof value !== "object") {
                 throw new Error("Elementary math mscarry isn't an 'object'");
             }
-            this.data = document.createElement((carry.location === 'n' || carry.location === 's') ? 'div' : 'span');
+            this.data = document.createElement((carry.location === 'n' || carry.location === 's') ? 'div' : 'mrow');
             this.data.appendChild(value);
             this.data.className = 'carry';
             this.data.style.fontSize = Math.round(carry.scriptsizemultiplier).toString() + '%';
@@ -393,7 +393,7 @@ class ElemMath {
                 if (crossout === 'none' || crossout==='') { // '' -- happens when there are two or more spaces in a row
                     return;    // nothing to do
                 }
-                let span = document.createElement("span");
+                let span = document.createElement('mrow');
                 span.appendChild(result);
 
                 switch (crossout) {
@@ -428,13 +428,13 @@ class ElemMath {
         function mergeCarryAndData(cell, previousCell) {
             let data = cell.data;
             if (data.textContent === NO_SPACE) {
-                let span = document.createElement('span');
+                let span = document.createElement('mrow');
                 span.appendChild(data);
                 data.textContent = '0';      // need digit width to get decent spacing/placement of the carry
                 span.className = "hidden-digit";
                 data = span;
             }
-            let parent = document.createElement('span');
+            let parent = document.createElement('mrow');
             parent.appendChild(data);
             switch (previousCell.carry.location) {
                 case 'n':
@@ -1082,7 +1082,7 @@ class ElemMath {
             for (const cellData of row.data) {
                 let htmlTD = document.createElement('mtd');
                 if (cellData.alignAt) {
-                    let span = document.createElement('span');
+                    let span = document.createElement('mrow');
                     span.style.display = cellData.alignAt === 1 ? 'inline-table' : 'inline-block';
                     span.appendChild(cellData.data);
                     cellData.data = span;
