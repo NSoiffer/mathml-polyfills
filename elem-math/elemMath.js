@@ -35,15 +35,15 @@
 import { _MathTransforms, MATHML_NS } from '../common/math-transforms.js'
 
 const ELEM_MATH_CSS = `
-table.elem-math {
+mtable.elem-math {
     border-collapse: collapse;
     border-spacing: 0px;
 }
-table.elem-math tr {
+mtable.elem-math tr {
     vertical-align: baseline;
 }
 
-td.curved-line {
+mtd.curved-line {
     position: absolute;
     padding-top: 0em;
     width: 0.75em;
@@ -56,11 +56,11 @@ td.curved-line {
     margin-right: 0.75em;
 }
 
-td.precedes-separator {
+mtd.precedes-separator {
     padding-right: 0 !important;    // override an inline style
 }
 
-td.separator {
+mtd.separator {
     padding-left: 0  !important;    
     padding-right: 0 !important;    // override an inline style
 }
@@ -226,7 +226,8 @@ class TableCell {
             if (typeof value !== "string") {
                 throw new Error("Elementary math mscarry isn't a 'string'");
             }
-            this.data = document.createTextNode(value);
+            this.data = document.createElementNS(MATHML_NS, "mtext");
+            this.data.appendChild(document.createTextNode(value));
         }
         this.carry = carry;                        // for multiple carries, 'data' is already built up -- value is last carry seen
         this.style = style || '';
@@ -1071,15 +1072,15 @@ class ElemMath {
         // set a class for columns of separators so that they are narrower (looks better)
         this.shrinkSeparatorColumns(stackRows);
 
-        let table = document.createElement('table');
+        let table = document.createElement('mtable');
         table.setAttribute('class', 'elem-math');
         for (const row of stackRows) {
-            let htmlRow = document.createElement('tr');
+            let htmlRow = document.createElement('mtr');
             if (row.style) {
                 htmlRow.setAttribute('style', row.style);
             }
             for (const cellData of row.data) {
-                let htmlTD = document.createElement('td');
+                let htmlTD = document.createElement('mtd');
                 if (cellData.alignAt) {
                     let span = document.createElement('span');
                     span.style.display = cellData.alignAt === 1 ? 'inline-table' : 'inline-block';
@@ -1103,11 +1104,11 @@ class ElemMath {
             if (row.addSpacingAfterRow) {
                 // can't put a margin on a table row or push it into the table cells above, so we add a dummy row here
                 // we need to continue any left/right border from the previous line
-                let newRow = document.createElement('tr');
+                let newRow = document.createElement('mtr');
                 newRow.style.height = '.5ex';
 
                 for (const cellData of row.data) {
-                    let newCell = document.createElement('td');
+                    let newCell = document.createElement('mtd');
                     if (/(border-left|border-right)/.test(cellData.style)) {
                         // extract borders -- this assumes the code never uses 'border: 1 2 3 4;'
                         const borders = cellData.style.match(/(border-left|border-right).*?;/g);
@@ -1156,20 +1157,22 @@ let transformElemMath = (el) => {
     }
 
     // put the math with table into a shadow DOM
-    const spanShadowHost =  document.createElement("span");
+    const spanShadowHost =  document.createElement('span');
     let shadowRoot = spanShadowHost.attachShadow({mode: "open"});
     shadowRoot.appendChild(_MathTransforms.getCSSStyleSheet());
 
     // create the table equivalent and put it into the shadow DOM
     const elParent = el.parentElement;
     const nextSibling = el.nextElementSibling;
+    const mathml = document.createElementNS(MATHML_NS, 'math');
     const table = new ElemMath(el).expandMStackElement(el);
-    spanShadowHost.shadowRoot.appendChild(table);
+    mathml.appendChild(table);
+    spanShadowHost.shadowRoot.appendChild(mathml);
 
     // need to create <mtext> <span> <math> elem math </math> </span> </mtext>
-    let mtext = document.createElementNS(MATHML_NS, "mtext");
+    let mtext = document.createElementNS(MATHML_NS, 'mtext');
     mtext.appendChild(spanShadowHost);                      // now have <mtext> <span> ...
-    let math = document.createElementNS(MATHML_NS, "math");
+    let math = document.createElementNS(MATHML_NS, 'math');
     spanShadowHost.appendChild(math);                       // now have <mtext> <span> <math> ...
     math.appendChild(el);                   // make el a child of math -- clone because can't detach el from DOM
     elParent.insertBefore(mtext, nextSibling);
