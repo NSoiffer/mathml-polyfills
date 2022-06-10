@@ -1134,7 +1134,6 @@ function addStyleSheetToShadowRoot(shadowRoot) {
     link.rel = 'stylesheet';
     link.type = 'text/css';
     link.href = import.meta.url + '/../elemMath.css';
-//    link.href = './elemMath.css';
     style.appendChild(link);
     shadowRoot.appendChild(style); 
 }
