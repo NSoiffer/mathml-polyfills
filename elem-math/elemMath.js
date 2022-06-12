@@ -78,7 +78,7 @@ mtd.separator {
 
 .crossout-horiz, .crossout-vert, .crossout-up, .crossout-down{
     position: relative;
-    display: inline-block;
+    /* display: inline-block; */
 }
 .crossout-horiz:before {
     content: '';
@@ -218,7 +218,7 @@ class TableCell {
             if (typeof value !== "object") {
                 throw new Error("Elementary math mscarry isn't an 'object'");
             }
-            this.data = document.createElement((carry.location === 'n' || carry.location === 's') ? 'div' : 'mrow');
+            this.data = document.createElementNS(MATHML_NS, 'mtext');
             this.data.appendChild(value);
             this.data.className = 'carry';
             this.data.style.fontSize = Math.round(carry.scriptsizemultiplier).toString() + '%';
@@ -226,7 +226,7 @@ class TableCell {
             if (typeof value !== "string") {
                 throw new Error("Elementary math mscarry isn't a 'string'");
             }
-            this.data = document.createElementNS(MATHML_NS, "mtext");
+            this.data = document.createElementNS(MATHML_NS, 'mtext');
             this.data.appendChild(document.createTextNode(value));
         }
         this.carry = carry;                        // for multiple carries, 'data' is already built up -- value is last carry seen
@@ -393,7 +393,7 @@ class ElemMath {
                 if (crossout === 'none' || crossout==='') { // '' -- happens when there are two or more spaces in a row
                     return;    // nothing to do
                 }
-                let span = document.createElement('mrow');
+                let span = document.createElementNS(MATHML_NS, 'mrow');
                 span.appendChild(result);
 
                 switch (crossout) {
@@ -428,27 +428,41 @@ class ElemMath {
         function mergeCarryAndData(cell, previousCell) {
             let data = cell.data;
             if (data.textContent === NO_SPACE) {
-                let span = document.createElement('mrow');
+                let span = document.createElementNS(MATHML_NS, 'mrow');
                 span.appendChild(data);
                 data.textContent = '0';      // need digit width to get decent spacing/placement of the carry
                 span.className = "hidden-digit";
                 data = span;
             }
-            let parent = document.createElement('mrow');
+            let newElement;
+            let parent = document.createElementNS(MATHML_NS, 'mrow');
             parent.appendChild(data);
             switch (previousCell.carry.location) {
                 case 'n':
+                    newElement = document.createElementNS(MATHML_NS, 'mover');
+                    newElement.appendChild(data);
+                    newElement.appendChild(previousCell.data);
+                    parent = newElement;
+                    break;
+
                 case 'w':
-                    parent.prepend(previousCell.data);
+                    newElement = document.createElementNS(MATHML_NS, 'mover');
+                    newElement.appendChild(previousCell.data);
+                    newElement.appendChild(data);
+                    parent = newElement;
                     break;
                 case 'nw': {
-                    let newElement = document.createElement('sup');
+                    // pre-superscript (base) <mprescripts/> none script
+                    newElement = document.createElementNS(MATHML_NS, 'mmultiscripts');
+                    newElement.appendChild(data);
+                    newElement.appendChild(document.createElementNS(MATHML_NS, 'mprescripts'));
+                    newElement.appendChild(document.createElementNS(MATHML_NS, 'none'));
                     newElement.appendChild(previousCell.data);
-                    parent.prepend(newElement);
+                    parent = newElement;
                     break;
                 }
                 case 'ne': {
-                    let newElement = document.createElement('sup');
+                    let newElement = document.createElementNS(MATHML_NS, 'msup');
                     newElement.appendChild(previousCell.data);
                     parent.appendChild(newElement);
                     break;
@@ -458,13 +472,13 @@ class ElemMath {
                     parent.appendChild(previousCell.data);
                     break;
                 case 'se': {
-                    let newElement = document.createElement('sub');
+                    let newElement = document.createElementNS(MATHML_NS, 'msub');
                     newElement.appendChild(previousCell.data);
                     parent.appendChild(newElement);
                     break;
                 }
                 case 'sw': {
-                    let newElement = document.createElement('sub');
+                    let newElement = document.createElementNS(MATHML_NS, 'msub');
                     newElement.appendChild(previousCell.data);
                     parent.prepend(newElement);
                     break;
@@ -1072,18 +1086,18 @@ class ElemMath {
         // set a class for columns of separators so that they are narrower (looks better)
         this.shrinkSeparatorColumns(stackRows);
 
-        let table = document.createElement('mtable');
+        let table = document.createElementNS(MATHML_NS, 'mtable');
         table.setAttribute('class', 'elem-math');
         for (const row of stackRows) {
-            let htmlRow = document.createElement('mtr');
+            let htmlRow = document.createElementNS(MATHML_NS, 'mtr');
             if (row.style) {
                 htmlRow.setAttribute('style', row.style);
             }
             for (const cellData of row.data) {
-                let htmlTD = document.createElement('mtd');
+                let htmlTD = document.createElementNS(MATHML_NS, 'mtd');
                 if (cellData.alignAt) {
-                    let span = document.createElement('mrow');
-                    span.style.display = cellData.alignAt === 1 ? 'inline-table' : 'inline-block';
+                    let span = document.createElementNS(MATHML_NS, 'mrow');
+                    // span.style.display = cellData.alignAt === 1 ? 'inline-table' : 'inline-block';
                     span.appendChild(cellData.data);
                     cellData.data = span;
                 }
@@ -1104,11 +1118,11 @@ class ElemMath {
             if (row.addSpacingAfterRow) {
                 // can't put a margin on a table row or push it into the table cells above, so we add a dummy row here
                 // we need to continue any left/right border from the previous line
-                let newRow = document.createElement('mtr');
+                let newRow = document.createElementNS(MATHML_NS, 'mtr');
                 newRow.style.height = '.5ex';
 
                 for (const cellData of row.data) {
-                    let newCell = document.createElement('mtd');
+                    let newCell = document.createElementNS(MATHML_NS, 'mtd');
                     if (/(border-left|border-right)/.test(cellData.style)) {
                         // extract borders -- this assumes the code never uses 'border: 1 2 3 4;'
                         const borders = cellData.style.match(/(border-left|border-right).*?;/g);
@@ -1152,31 +1166,13 @@ let transformElemMath = (el) => {
     // hack to allow definition of custom element "m-elem-math" to also work with 'transformElemMath()'
     if (el.parentElement && (el.parentElement.tagName === 'M-ELEM-MATH' ||
                             (el.parentElement.parentElement && el.parentElement.parentElement.tagName === 'M-ELEM-MATH'))) {
-        return;
+        return null;
     }
 
-    // put the math with table into a shadow DOM
-    const spanShadowHost =  document.createElement('span');
-    let shadowRoot = spanShadowHost.attachShadow({mode: "open"});
-    shadowRoot.appendChild(_MathTransforms.getCSSStyleSheet());
-
-    // create the table equivalent and put it into the shadow DOM
-    const elParent = el.parentElement;
-    const nextSibling = el.nextElementSibling;
-    const mathml = document.createElementNS(MATHML_NS, 'math');
+    // create the mtable for the math
     const table = new ElemMath(el).expandMStackElement(el);
-    mathml.appendChild(table);
-    spanShadowHost.shadowRoot.appendChild(mathml);
-
-    // need to create <mtext> <span> <math> elem math </math> </span> </mtext>
-    let mtext = document.createElementNS(MATHML_NS, 'mtext');
-    mtext.appendChild(spanShadowHost);                      // now have <mtext> <span> ...
-    let math = document.createElementNS(MATHML_NS, 'math');
-    spanShadowHost.appendChild(math);                       // now have <mtext> <span> <math> ...
-    math.appendChild(el);                   // make el a child of math -- clone because can't detach el from DOM
-    elParent.insertBefore(mtext, nextSibling);
-
-    return null;
+    table.setAttribute("intent", el.tagName==='mlongdiv' ? "long-division" : "elementary-math");    // what should these be?
+    return table;
 }
 
 _MathTransforms.add('mstack', transformElemMath, ELEM_MATH_CSS);
