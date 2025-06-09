@@ -26,36 +26,8 @@
   THE SOFTWARE.
 */
 
-import { _MathTransforms, cloneElementWithShadowRoot, MATHML_NS } from '../common/math-transforms.js'
+import { _MathTransforms, getDimensions, MATHML_NS } from '../common/math-transforms.js'
 
-/**
- * @param {HTMLElement} mpadded
- * @returns {{width:number, height: number: depth: number}}
- */
-function getDimensions(mpadded) {
-    // Create an mrow around the children of 'mpadded' and add a zero height/depth mspace to them.
-    // the y/top/bottom of the mspace is the baseline, so we can find height/depth of el
-    // undo the changes to the DOM and return the values
-    // Note: the mspace should not cause reflow, so the change/undo hopefully is somewhat efficient
-    const mrow = document.createElementNS(MATHML_NS, 'mrow');
-    mrow.appendChild( document.createElementNS(MATHML_NS, 'mspace') );
-    const cloneMpadded = cloneElementWithShadowRoot(mpadded);
-    for (let i = 0; i < cloneMpadded.children.length; i++) {
-        mrow.appendChild(cloneMpadded.children[i]);    // removed from clone and added to mrow
-    }
-    cloneMpadded.appendChild(mrow);
-    mpadded.parentElement.replaceChild(cloneMpadded, mpadded);      // should not be reflow
-
-    const mspaceRect = mrow.firstElementChild.getBoundingClientRect();
-    const mpaddedRect = mrow.getBoundingClientRect();
-
-    cloneMpadded.parentElement.replaceChild(mpadded, cloneMpadded);      // restore original structure; should not reflow
-    return {
-        width: mpaddedRect.width,
-        height: mspaceRect.y - mpaddedRect.top,
-        depth: mpaddedRect.bottom - mspaceRect.y
-    };
-}
 /**
  * @param {HTMLElement} el
  * @param {string} attr

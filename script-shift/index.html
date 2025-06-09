@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <title>mlabeledtr tests</title>
+  <meta charset="utf-8" />
+  <script type="module">
+    import { _MathTransforms } from '../common/math-transforms.js'
+    import './script-shift.js'
+    window.addEventListener("DOMContentLoaded", () => {
+      _MathTransforms.transform(document.body)
+    })
+  </script>
+</head>
+
+<body>
+  <h1 id="top">mlabeledtr</h1>
+
+  <p>This page contains some tests for the mlabeledtr element.
+    These are rendered via the 'mlabeledtr.js' polyfill.
+  </p>
+
+  <p> This test uses the default value for <code>side</code>. The label "(2.1) should render on the right side of the first row</p>
+  <math display="block">
+  <mtable>
+    <mtr>
+      <mtd><mtext>Without shift</mtext>></mtd>
+      <mtd><mtext>With 5px shift</mtext>></mtd>
+      <mtd><mtext>With 15px shift</mtext>></mtd>
+      <mtd><mtext>With 1ex shift</mtext>></mtd>
+      <mtd><mtext>With 2ex shift</mtext>></mtd>
+    </mtr>
+    <mtr>
+      <mtd> <msub<mi>a</mi><mi>b</mi></msub> </mtd>
+      <mtd> <msub subscriptshift="5px"> </msub><mi>a</mi><mi>b</mi></msub> </mtd>
+      <mtd> <msub subscriptshift="15px"></msub><mi>a</mi><mi>b</mi></msub> </mtd>
+      <mtd> <msub subscriptshift="1ex"> </msub><mi>a</mi><mi>b</mi></msub> </mtd>
+      <mtd> <msub subscriptshift="2ex"> </msub><mi>a</mi><mi>b</mi></msub> </mtd>
+    </mtr>
+    <mtr>
+      <mtd> <msub<mi>a</mi> <msup><mn>2</mn><mi>b</mi></msup></msub> </mtd>
+      <mtd> <msub subscriptshift="5px"> </msub><mi>a</mi> <msup><mn>2</mn><mi>b</mi></msup> </msub> </mtd>
+      <mtd> <msub subscriptshift="15px"></msub><mi>a</mi> <msup><mn>2</mn><mi>b</mi></msup> </msub> </mtd>
+      <mtd> <msub subscriptshift="1ex"> </msub><mi>a</mi> <msup><mn>2</mn><mi>b</mi></msup> </msub> </mtd>
+      <mtd> <msub subscriptshift="2ex"> </msub><mi>a</mi> <msup><mn>2</mn><mi>b</mi></msup> </msub> </mtd>
+    </mtr>
+  </mtable>
+</math>
+
+</body>
+</html>

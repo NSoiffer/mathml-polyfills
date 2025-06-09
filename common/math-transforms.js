@@ -109,3 +109,32 @@ export function convertToPx(element, length) {
   return result;
 }
 
+/**
+ * @param {HTMLElement} element
+ * @returns {{width:number, height: number, depth: number}}
+ */
+export function getDimensions(element) {
+    // IMPORTANT: 'element' must have a parent element (i.e., it should not be "math")
+    // Create an mrow around the children of 'element' and add a zero height/depth mspace to them.
+    // the y/top/bottom of the mspace is the baseline, so we can find height/depth of el
+    // undo the changes to the DOM and return the values
+    // Note: the mspace should not cause reflow, so the change/undo hopefully is somewhat efficient
+    const mrow = document.createElementNS(MATHML_NS, 'mrow');
+    mrow.appendChild( document.createElementNS(MATHML_NS, 'mspace') );
+    const clonedElement = cloneElementWithShadowRoot(element);
+    for (let i = 0; i < clonedElement.children.length; i++) {
+        mrow.appendChild(clonedElement.children[i]);    // removed from clone and added to mrow
+    }
+    clonedElement.appendChild(mrow);
+    element.parentElement.replaceChild(clonedElement, element);      // should not be reflow
+
+    const mspaceRect = mrow.firstElementChild.getBoundingClientRect();
+    const elementRect = mrow.getBoundingClientRect();
+
+    clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
+    return {
+        width: elementRect.width,
+        height: mspaceRect.y - elementRect.top,
+        depth: elementRect.bottom - mspaceRect.y
+    };
+}
