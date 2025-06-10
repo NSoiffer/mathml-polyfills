@@ -39,7 +39,7 @@ const transformSubscriptShift = (element) => {
   // into account the default shift.
   // Note: finding the baseline is tricky, so we use the top of the bounding box. If the baseline shifts by 'x', so does the top.
   let script = element.children[1];
-  let baseDimensions = getDimensions(element.firstChild);
+  let baseDimensions = getDimensions(element.children[0]);
   let scriptDimensions = getDimensions(script);
   console.log(`element: ${element.outerHTML}\nscript: ${script.outerHTML}`);
   console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
