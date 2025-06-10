@@ -42,8 +42,8 @@ const transformSubscriptShift = (element) => {
   let scriptDimensions = getDimensions(script);
   console.log(`element: ${element.outerHTML}\nscript: ${script.outerHTML}`);
   console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
-  console.log(`script BBox: ${script.getBoundingClientRect}`);
-  let scriptBaseline = script.top - scriptDimensions.height;
+  console.log(`script BBox: ${script.getBoundingClientRect()}`);
+  let scriptBaseline = script.getBoundingClientRect().top - scriptDimensions.height;
   let shiftAmount = convertToPx(element, element.getAttribute('subscriptshift'));
   console.log(`scriptBaseline: ${scriptBaseline}, shiftAmount: ${shiftAmount}`);
   let amountToPad = shiftAmount - scriptBaseline;
