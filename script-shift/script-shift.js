@@ -43,8 +43,8 @@ const transformSubscriptShift = (element) => {
   console.log(`\n\nelement: ${element.outerHTML}\nbase: ${base.outerHTML}\nscript: ${script.outerHTML}`);
   let baseDimensions = getDimensions(base);
   let scriptDimensions = getDimensions(script);
-  // console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
-  // console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
+  console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
+  console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
   let baseBBox = base.getBoundingClientRect();
   console.log(`base BBox y, top, bottom, height: (${baseBBox.y}, ${baseBBox.top}, ${baseBBox.bottom}, ${baseBBox.height})`);
   let scriptBBox = script.getBoundingClientRect();
