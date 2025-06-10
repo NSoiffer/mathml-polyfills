@@ -54,7 +54,7 @@ const transformSubscriptShift = (element) => {
   let scriptShift = scriptBBox.y - baseBBox.y;
   let shiftAmount = convertToPx(element, element.getAttribute('subscriptshift'));
   console.log(`scriptShift: ${scriptShift}, shiftAmount: ${shiftAmount}`);
-  let amountToPad = scriptShift - shiftAmount; 
+  let amountToPad = shiftAmount - shiftAmount; 
   if (amountToPad > 0) {
     let mpadded = document.createElementNS(MATHML_NS, "mpadded");
     let scriptDimensions = getDimensions(script);
