@@ -42,10 +42,11 @@ const transformSubscriptShift = (element) => {
   let script = element.children[1];
   let baseDimensions = getDimensions(base);
   let scriptDimensions = getDimensions(script);
-  console.log(`element: ${element.outerHTML}\nscript: ${script.outerHTML}`);
+  console.log(`element: ${element.outerHTML}\nbase: ${base.outerHTML}\nscript: ${script.outerHTML}`);
   console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
   console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
-  console.log(`script BBox: ${script.getBoundingClientRect()}`);
+  scriptBBox = script.getBoundingClientRect();
+  console.log(`script BBox y, top, height: (${scriptBBox.y}, ${scriptBBox.top}, , ${scriptBBox.height})`);
   let baseBaseline = base.getBoundingClientRect().top + baseDimensions.height;
   let scriptBaseline = script.getBoundingClientRect().top + scriptDimensions.height;
   let scriptShift = scriptBaseline - baseBaseline
@@ -60,7 +61,10 @@ const transformSubscriptShift = (element) => {
   mpadded.setAttribute("height", `${scriptDimensions.height + amountToPad}px`); // relative shift not in core
   mpadded.setAttribute("voffset", `${amountToPad}px`);
   element.replaceChild(mpadded, script);
+  console.log(`element after replace={element.outerHTML}`);
   mpadded.appendChild(script);
+  console.log(`element after append={element.outerHTML}`);
+
 }
 
 const transformSuperscriptShift = (script) => {
