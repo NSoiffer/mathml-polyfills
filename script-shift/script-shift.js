@@ -40,24 +40,23 @@ const transformSubscriptShift = (element) => {
   // Note: finding the baseline is tricky, so we use the top of the bounding box. If the baseline shifts by 'x', so does the top.
   let base = element.children[0];
   let script = element.children[1];
-  console.log(`element: ${element.outerHTML}\nbase: ${base.outerHTML}\nscript: ${script.outerHTML}`);
-  // let baseDimensions = getDimensions(base);
-  // let scriptDimensions = getDimensions(script);
-  // console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
-  // console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
+  console.log(`\n\nelement: ${element.outerHTML}\nbase: ${base.outerHTML}\nscript: ${script.outerHTML}`);
+  let baseDimensions = getDimensions(base);
+  let scriptDimensions = getDimensions(script);
+  console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
+  console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
   let baseBBox = base.getBoundingClientRect();
   console.log(`base BBox y, top, bottom, height: (${baseBBox.y}, ${baseBBox.top}, ${baseBBox.bottom}, ${baseBBox.height})`);
   let scriptBBox = script.getBoundingClientRect();
   console.log(`script BBox y, top, height: (${scriptBBox.y}, ${scriptBBox.top}, , ${scriptBBox.height})`);
-  // let baseBaseline = base.getBoundingClientRect().top + baseDimensions.height;
-  // let scriptBaseline = script.getBoundingClientRect().top + scriptDimensions.height;
-  let scriptShift = scriptBBox.y - baseBBox.y;
+  let baseBaseline = base.getBoundingClientRect().y + baseDimensions.height;
+  let scriptBaseline = script.getBoundingClientRect().y + scriptDimensions.height;
+  let scriptShift = scriptBaseline - baseBaseline
   let shiftAmount = convertToPx(element, element.getAttribute('subscriptshift'));
   let amountToPad = shiftAmount - scriptShift; 
   console.log(`amountToPad: ${amountToPad}, scriptShift: ${scriptShift}, shiftAmount: ${shiftAmount}`);
   if (amountToPad > 0) {
     let mpadded = document.createElementNS(MATHML_NS, "mpadded");
-    let scriptDimensions = getDimensions(script);
     mpadded.setAttribute("height", `${scriptDimensions.height + amountToPad}px`); // relative shift not in core
     mpadded.setAttribute("voffset", `${amountToPad}px`);
     console.log(`element before replace={element.outerHTML}`);
