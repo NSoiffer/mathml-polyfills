@@ -38,14 +38,15 @@ const transformSubscriptShift = (element) => {
   // and then pad it by the amount specified in the subscriptshift or superscriptshift attribute taking
   // into account the default shift.
   // Note: finding the baseline is tricky, so we use the top of the bounding box. If the baseline shifts by 'x', so does the top.
+  let base = element.children[0];
   let script = element.children[1];
-  let baseDimensions = getDimensions(element.children[0]);
+  let baseDimensions = getDimensions(base);
   let scriptDimensions = getDimensions(script);
   console.log(`element: ${element.outerHTML}\nscript: ${script.outerHTML}`);
   console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
   console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
   console.log(`script BBox: ${script.getBoundingClientRect()}`);
-  let baseBaseline = element.firstChild.getBoundingClientRect().top + baseDimensions.height;
+  let baseBaseline = base.getBoundingClientRect().top + baseDimensions.height;
   let scriptBaseline = script.getBoundingClientRect().top + scriptDimensions.height;
   let scriptShift = scriptBaseline - baseBaseline
   let shiftAmount = convertToPx(element, element.getAttribute('subscriptshift'));
