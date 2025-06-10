@@ -41,13 +41,11 @@ const transformSubscriptShift = (element) => {
   let base = element.children[0];
   let script = element.children[1];
   console.log(`\n\nelement: ${element.outerHTML}\nbase: ${base.outerHTML}\nscript: ${script.outerHTML}`);
-  // let baseDimensions = getDimensions(element);
-  // let scriptDimensions = getDimensions(script);
-  let baseDimensions = {"width":13.633346557617188,"height":17,"depth":5}
-  let scriptDimensions = {"width":13.633346557617188,"height":17,"depth":5}
+  let baseDimensions = getDimensions(base);
+  let scriptDimensions = getDimensions(script);
   // console.log(`baseDimensions: ${JSON.stringify(baseDimensions)}`);
   // console.log(`scriptDimensions: ${JSON.stringify(scriptDimensions)}`);
-  let baseBBox = element.getBoundingClientRect();
+  let baseBBox = base.getBoundingClientRect();
   console.log(`base BBox y, top, bottom, height: (${baseBBox.y}, ${baseBBox.top}, ${baseBBox.bottom}, ${baseBBox.height})`);
   let scriptBBox = script.getBoundingClientRect();
   console.log(`script BBox y, top, height: (${scriptBBox.y}, ${scriptBBox.top}, , ${scriptBBox.height})`);
@@ -60,7 +58,7 @@ const transformSubscriptShift = (element) => {
   if (amountToPad > 0) {
     let mpadded = document.createElementNS(MATHML_NS, "mpadded");
     mpadded.setAttribute("height", `${scriptDimensions.height + amountToPad}px`); // relative shift not in core
-    mpadded.setAttribute("voffset", `${amountToPad}px`);
+    // mpadded.setAttribute("voffset", `${amountToPad}px`);
     console.log(`element before replace=${element.outerHTML}`);
     element.replaceChild(mpadded, script);
     console.log(`element after replace=${element.outerHTML}`);
