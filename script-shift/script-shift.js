@@ -61,11 +61,11 @@ const transformSubscriptShift = (element) => {
     let mpadded = document.createElementNS(MATHML_NS, "mpadded");
     mpadded.setAttribute("height", `${scriptDimensions.height + amountToPad}px`); // relative shift not in core
     mpadded.setAttribute("voffset", `${amountToPad}px`);
-    console.log(`element before replace={element.outerHTML}`);
+    console.log(`element before replace=${element.outerHTML}`);
     element.replaceChild(mpadded, script);
-    console.log(`element after replace={element.outerHTML}`);
+    console.log(`element after replace=${element.outerHTML}`);
     mpadded.appendChild(script);
-    console.log(`element after append={element.outerHTML}`);
+    console.log(`element after append=${element.outerHTML}`);
   }
 
   return element;
