@@ -106,9 +106,9 @@ export function convertToPx(element, length) {
  */
 export function getDimensions(element) {
     // IMPORTANT: 'element' must have a parent element (i.e., it should not be "math")
+    const elementRect = element.getBoundingClientRect();
     let doComputation = (mspace) => {
       const mspaceRect = mspace.getBoundingClientRect();
-      const elementRect = mspace.parentElement.getBoundingClientRect();
       console.log(`elementRect: ${JSON.stringify(elementRect)}`);
       return {
           width: elementRect.width,
