@@ -110,6 +110,7 @@ export function getDimensions(element) {
     let doComputation = (mspace) => {
       const mspaceRect = mspace.getBoundingClientRect();
       console.log(`elementRect: ${JSON.stringify(elementRect)}`);
+      console.log(`mspaceRect: ${JSON.stringify(mspaceRect)}`);
       return {
           width: elementRect.width,
           height: mspaceRect.y - elementRect.top,
