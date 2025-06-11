@@ -133,11 +133,13 @@ function measureDimensions(element, depth, doComputation) {
     const mspace = document.createElementNS(MATHML_NS, 'mspace')
     mspace.setAttribute('depth', depth);
     const clonedElement = cloneElementWithShadowRoot(element);
-    mrow.children = clonedElement.children; // move the children of the cloned element to the mrow
+    for (let i = 0; i < clonedElement.children.length; i++) {
+        mrow.appendChild(clonedElement.children[i]);    // removed from clone and added to mrow
+    }
     mrow.appendChild(mspace);
     clonedElement.appendChild(mrow);
     element.parentElement.replaceChild(clonedElement, element);      // should not be reflow
-    let answer = doComputation(mspace);
+    let answer = doComputation(mspace); // this will return the dimensions of the element
     clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
     return answer;
 }
