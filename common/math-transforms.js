@@ -95,7 +95,7 @@ export function convertToPx(element, length) {
   }
 
   let doComputation = (mspace) => {
-    return mspace.getBoundingClientRect().height;
+    return mspace.getBoundingClientRect().depth;
   };
   return measureDimensions(element, length, doComputation);
 }
@@ -121,22 +121,23 @@ export function getDimensions(element) {
 }
 /**
  * @param {HTMLElement} element
+ * @param {string} length (CSS length unit, e.g., '1em', '2px', etc.)
  */
-function measureDimensions(element, height, doComputation) {
+function measureDimensions(element, depth, doComputation) {
     // IMPORTANT: 'element' must have a parent element (i.e., it should not be "math")
-    // Create an mrow around the children of 'element' and add an mspace with 'height to them.
+    // Create an mrow around the children of 'element' and add an mspace with 'depth' to children of the mrow.
+    // With 0 height, the mspace's y/top should be the baseline of the mrow,
+    //   so it can be used to calculate the math's height/depth. 
     // Note: the mspace should not cause reflow, so the change/undo hopefully is somewhat efficient
     const mrow = document.createElementNS(MATHML_NS, 'mrow');
     const mspace = document.createElementNS(MATHML_NS, 'mspace')
-    mspace.setAttribute('height', height);
-    mrow.appendChild(mspace);
+    mspace.setAttribute('depth', depth);
     const clonedElement = cloneElementWithShadowRoot(element);
-    for (let i = 0; i < clonedElement.children.length; i++) {
-        mrow.appendChild(clonedElement.children[i]);    // removed from clone and added to mrow
-    }
+    mrow.children = clonedElement.children; // move the children of the cloned element to the mrow
+    mrow.appendChild(mspace);
     clonedElement.appendChild(mrow);
     element.parentElement.replaceChild(clonedElement, element);      // should not be reflow
-    let answer = doComputation(mspace); // this will return the dimensions of the element
+    let answer = doComputation(mspace);
     clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
     return answer;
 }
