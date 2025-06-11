@@ -94,19 +94,10 @@ export function convertToPx(element, length) {
       return parseFloat(length);
   }
 
-  // add a temp element with desired length; set it as the width; record the width, then delete the temp element.
-  // In Safari (Aug 2020), unknown elements in MathML are thrown out, so adding a 'div' results in 0 width. For some reason, 'img' is ok.
-  let img = document.createElement("img");  // create temporary element
-  let leafWrapper = document.createElementNS(MATHML_NS, 'mtext'); // mtext is integration point for HTML
-  leafWrapper.appendChild(img);
-  leafWrapper.style.overflow = "hidden";
-  leafWrapper.style.visibility = "hidden";
-  img.style.width = length;
-  element.appendChild(leafWrapper);
-  const result = leafWrapper.getBoundingClientRect().width;
-  leafWrapper.remove();
-
-  return result;
+  let doComputation = (mspace) => {
+    return mspace.getBoundingClientRect().height;
+  };
+  return measureDimensions(element, length, doComputation);
 }
 
 /**
@@ -115,26 +106,37 @@ export function convertToPx(element, length) {
  */
 export function getDimensions(element) {
     // IMPORTANT: 'element' must have a parent element (i.e., it should not be "math")
-    // Create an mrow around the children of 'element' and add a zero height/depth mspace to them.
-    // the y/top/bottom of the mspace is the baseline, so we can find height/depth of el
-    // undo the changes to the DOM and return the values
+    let doComputation = (mspace) => {
+      const mspaceRect = mspace.getBoundingClientRect();
+      const elementRect = mspace.parentElement.getBoundingClientRect();
+
+      clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
+      return {
+          width: elementRect.width,
+          height: mspaceRect.y - elementRect.top,
+          depth: elementRect.bottom - mspaceRect.y
+      };
+    };
+    return measureDimensions(element, '0px', doComputation);
+}
+/**
+ * @param {HTMLElement} element
+ */
+function measureDimensions(element, height, doComputation) {
+    // IMPORTANT: 'element' must have a parent element (i.e., it should not be "math")
+    // Create an mrow around the children of 'element' and add an mspace with 'height to them.
     // Note: the mspace should not cause reflow, so the change/undo hopefully is somewhat efficient
     const mrow = document.createElementNS(MATHML_NS, 'mrow');
-    mrow.appendChild( document.createElementNS(MATHML_NS, 'mspace') );
+    const mspace = document.createElementNS(MATHML_NS, 'mspace')
+    mspace.setAttribute('height', height);
+    mrow.appendChild(mspace);
     const clonedElement = cloneElementWithShadowRoot(element);
     for (let i = 0; i < clonedElement.children.length; i++) {
         mrow.appendChild(clonedElement.children[i]);    // removed from clone and added to mrow
     }
     clonedElement.appendChild(mrow);
     element.parentElement.replaceChild(clonedElement, element);      // should not be reflow
-
-    const mspaceRect = mrow.firstElementChild.getBoundingClientRect();
-    const elementRect = mrow.getBoundingClientRect();
-
+    let answer = doComputation(mspace); // this will return the dimensions of the element
     clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
-    return {
-        width: elementRect.width,
-        height: mspaceRect.y - elementRect.top,
-        depth: elementRect.bottom - mspaceRect.y
-    };
+    return answer;
 }
