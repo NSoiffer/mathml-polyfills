@@ -52,9 +52,9 @@ const transformSubscriptShift = (element) => {
   let baseBaseline = base.getBoundingClientRect().y + baseDimensions.height;
   let scriptBaseline = script.getBoundingClientRect().y + scriptDimensions.height;
   let scriptShift = scriptBaseline - baseBaseline
-  let shiftAmount = convertToPx(element, element.getAttribute('subscriptshift'));
-  let amountToPad = shiftAmount - scriptShift; 
-  console.log(`amountToPad: ${amountToPad}, scriptShift: ${scriptShift}, shiftAmount: ${shiftAmount}`);
+  let shiftAttr = convertToPx(element, element.getAttribute('subscriptshift'));
+  let amountToPad = shiftAttr - scriptShift; 
+  console.log(`amountToPad: ${amountToPad}, scriptShift: ${scriptShift}, shiftAttr: ${shiftAttr}`);
   if (amountToPad > 0) {
     let mpadded = document.createElementNS(MATHML_NS, "mpadded");
     mpadded.setAttribute("height", `${scriptDimensions.height + amountToPad}px`); // relative shift not in core
