@@ -109,8 +109,6 @@ export function getDimensions(element) {
     let doComputation = (mspace) => {
       const mspaceRect = mspace.getBoundingClientRect();
       const elementRect = mspace.parentElement.getBoundingClientRect();
-
-      clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
       return {
           width: elementRect.width,
           height: mspaceRect.y - elementRect.top,
