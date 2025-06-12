@@ -139,7 +139,7 @@ function measureDimensions(element, depth, doComputation) {
     mrow.appendChild(mspace);
     clonedElement.appendChild(mrow);
     element.parentElement.replaceChild(clonedElement, element);      // should not be reflow
-    let answer = doComputation(mspace); // this will return the dimensions of the element
+    let answer = setTimeout(doComputation(mspace), 200); // this will return the dimensions of the element
     clonedElement.parentElement.replaceChild(element, clonedElement);      // restore original structure; should not reflow
     return answer;
 }
